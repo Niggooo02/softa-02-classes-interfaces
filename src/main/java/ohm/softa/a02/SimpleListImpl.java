@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Peter Kurfer
  * Created on 10/6/17.
  */
-public class SimpleListImpl implements SimpleList, Iterable<SimpleListImpl.SimpleListElement> {
+public class SimpleListImpl implements SimpleList, Iterable<Object> {
     private SimpleListElement head;
 
     @Override
@@ -18,18 +18,13 @@ public class SimpleListImpl implements SimpleList, Iterable<SimpleListImpl.Simpl
             return;
         }
 
-        if (head.next == null) {
-            head.next = new SimpleListElement(o);
+        SimpleListElement element = head;
+
+        while (element.next != null) {
+            element = element.next;
         }
 
-        for (SimpleListElement element : this) {
-            if (element.next == null) {
-                element.next = new SimpleListElement(o);
-                return;
-            }
-        }
-
-        throw new IllegalStateException();
+        element.next = new SimpleListElement(o);
     }
 
     @Override
@@ -49,7 +44,7 @@ public class SimpleListImpl implements SimpleList, Iterable<SimpleListImpl.Simpl
     public SimpleList filter(SimpleFilter filter) {
         SimpleList filteredList = new SimpleListImpl();
 
-        for (SimpleListElement element : this) {
+        for (Object element : this) {
             if (filter.include(element)) {
                 filteredList.add(element);
             }
@@ -59,12 +54,13 @@ public class SimpleListImpl implements SimpleList, Iterable<SimpleListImpl.Simpl
     }
 
     @Override
-    public Iterator<SimpleListElement> iterator() {
+    public Iterator<Object> iterator() {
         return new SimpleIteratorImpl();
     }
 
-    class SimpleIteratorImpl implements Iterator<SimpleListElement> {
+    class SimpleIteratorImpl implements Iterator<Object> {
         private SimpleListElement currentElement = head;
+        private boolean isFirst = true;
 
         @Override
         public boolean hasNext() {
@@ -72,14 +68,18 @@ public class SimpleListImpl implements SimpleList, Iterable<SimpleListImpl.Simpl
         }
 
         @Override
-        public SimpleListElement next() {
+        public Object next() {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
 
-            currentElement = currentElement.next;
+            if (isFirst) {
+                isFirst = false;
+                return currentElement;
+            }
 
-            return currentElement;
+            currentElement = currentElement.next;
+            return currentElement.element;
         }
     }
 
