@@ -44,9 +44,9 @@ public class SimpleListImpl implements SimpleList, Iterable<Object> {
     public SimpleList filter(SimpleFilter filter) {
         SimpleList filteredList = new SimpleListImpl();
 
-        for (Object element : this) {
-            if (filter.include(element)) {
-                filteredList.add(element);
+        for (Object listItem : this) {
+            if (filter.include(listItem)) {
+                filteredList.add(listItem);
             }
         }
 
@@ -75,7 +75,7 @@ public class SimpleListImpl implements SimpleList, Iterable<Object> {
 
             if (isFirst) {
                 isFirst = false;
-                return currentElement;
+                return currentElement.element;
             }
 
             currentElement = currentElement.next;
